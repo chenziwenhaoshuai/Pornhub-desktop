@@ -1,0 +1,17 @@
+# Rust / Tauri build output
+src-tauri/target/
+src-tauri/gen/schemas/
+
+# Node dependencies
+node_modules/
+
+# Local editor / OS files
+.vscode/
+.idea/
+*.log
+Thumbs.db
+.DS_Store
+
+# Local runtime data (never committed)
+*.cookies.json
+settings.json

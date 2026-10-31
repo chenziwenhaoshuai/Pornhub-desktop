@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pornhub Desktop</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app">
+  <header class="titlebar" id="titlebar" data-tauri-drag-region="deep">
+    <div class="brand">
+      <span class="brand-mark">PH</span>
+      <span class="brand-name">Desktop</span>
+    </div>
+    <div class="navbtns">
+      <button class="iconbtn" id="navBack" title="后退">&#8592;</button>
+      <button class="iconbtn" id="navForward" title="前进">&#8594;</button>
+      <button class="iconbtn" id="navReload" title="刷新">&#8635;</button>
+    </div>
+    <div class="searchwrap" data-tauri-drag-region="false">
+      <svg viewBox="0 0 24 24" class="searchicon"><path d="M10.5 3a7.5 7.5 0 1 0 4.55 13.46l4.24 4.24 1.42-1.42-4.24-4.24A7.5 7.5 0 0 0 10.5 3Zm0 2a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Z"/></svg>
+      <input id="searchInput" type="text" placeholder="搜索视频、演员、标签…" autocomplete="off" spellcheck="false" />
+    </div>
+    <div class="tb-right">
+      <button class="account-pill" id="accountBtn" title="账号">
+        <span class="avatar" id="accountAvatar">?</span>
+        <span class="account-name" id="accountName">登录</span>
+      </button>
+      <div class="winctl">
+        <button class="winbtn" data-win="minimize" title="最小化"><svg viewBox="0 0 12 12"><path d="M2 6h8"/></svg></button>
+        <button class="winbtn" data-win="maximize" title="最大化"><svg viewBox="0 0 12 12"><rect x="2.5" y="2.5" width="7" height="7" fill="none" stroke="currentColor"/></svg></button>
+        <button class="winbtn close" data-win="close" title="关闭"><svg viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6"/></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <div class="shell">
+    <aside class="sidebar">
+      <nav class="nav" id="sideNav">
+        <button class="navitem" data-nav="home">
+          <svg viewBox="0 0 24 24"><path d="M12 3 3 10.5V21h6v-6h6v6h6V10.5L12 3Z"/></svg><span>首页</span>
+        </button>
+        <button class="navitem" data-nav="categories">
+          <svg viewBox="0 0 24 24"><path d="M4 4h7v7H4V4Zm9 0h7v7h-7V4ZM4 13h7v7H4v-7Zm9 0h7v7h-7v-7Z"/></svg><span>分类</span>
+        </button>
+        <button class="navitem" data-nav="trending">
+          <svg viewBox="0 0 24 24"><path d="M13 2 4.5 13.5H11L9.5 22 19 10h-6.5L13 2Z"/></svg><span>热门</span>
+        </button>
+        <button class="navitem" data-nav="newest">
+          <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2Zm1 4v6l5 3-1 1.7-6-3.6V6h2Z"/></svg><span>最新</span>
+        </button>
+        <button class="navitem" data-nav="history">
+          <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 8.5 12h-2.2A6.8 6.8 0 1 1 12 5.2c1.9 0 3.6.8 4.8 2H14v2h6V3h-2v2.3A9 9 0 0 0 12 3Zm-1 4v6l5 3 1-1.7-4-2.4V7h-2Z"/></svg><span>观看历史</span>
+        </button>
+        <div class="nav-sep"></div>
+        <button class="navitem" data-nav="settings">
+          <svg viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm9 4c0-.6-.05-1.2-.15-1.8l2-1.5-2-3.4-2.3 1a9 9 0 0 0-3.1-1.8L15 2h-6l-.45 2.5a9 9 0 0 0-3.1 1.8l-2.3-1-2 3.4 2 1.5a9.6 9.6 0 0 0 0 3.6l-2 1.5 2 3.4 2.3-1a9 9 0 0 0 3.1 1.8L9 22h6l.45-2.5a9 9 0 0 0 3.1-1.8l2.3 1 2-3.4-2-1.5c.1-.6.15-1.2.15-1.8Z"/></svg><span>设置</span>
+        </button>
+      </nav>
+
+      <div class="side-card" id="sideAccount">
+        <div class="side-card-title">账号</div>
+        <div class="side-card-body" id="sideAccountBody">未登录</div>
+      </div>
+
+      <div class="side-foot" id="connState">代理 127.0.0.1:7897</div>
+    </aside>
+
+    <main class="view" id="view" tabindex="-1"></main>
+  </div>
+</div>
+
+<div id="modalRoot"></div>
+<div id="toasts"></div>
+
+<script src="vendor/hls.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
