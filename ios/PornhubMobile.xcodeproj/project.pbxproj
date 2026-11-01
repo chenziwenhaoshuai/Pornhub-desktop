@@ -210,6 +210,9 @@
 				"zh-Hans",
 			);
 			mainGroup = ABCDEF000000000000000043;
+			packageReferences = (
+				ABCDEF00000000000000004F /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+			);
 			productRefGroup = ABCDEF000000000000000042 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";

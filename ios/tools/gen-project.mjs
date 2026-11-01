@@ -285,6 +285,9 @@ ${groups.join('\n')}
 				"zh-Hans",
 			);
 			mainGroup = ${id('group:root')};
+			packageReferences = (
+				${id('pkg:ref')} /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+			);
 			productRefGroup = ${id('group:products')} /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
