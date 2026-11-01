@@ -129,6 +129,7 @@ struct VideoDetailView: View {
                 .aspectRatio(16.0 / 9.0, contentMode: .fit)
                 .overlay(PlayerSurface(player: vm.player.player) { fullscreen in
                     isFullscreen = fullscreen
+                    vm.player.handleFullscreen(fullscreen)
                 })
 
             if let failure = vm.player.errorMessage {

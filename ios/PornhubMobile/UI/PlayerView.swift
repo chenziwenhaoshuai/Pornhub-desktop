@@ -35,6 +35,8 @@ final class PlayerModel: ObservableObject {
     private var useCache = true
     private var prefetchEnabled = true
     private var usedFallback = false
+    private var lastKnownPlaying = false
+    private var wasPlayingBeforeFullscreen = false
     private var started = false
 
     private(set) var vkey = ""
@@ -183,7 +185,9 @@ final class PlayerModel: ObservableObject {
         controlSink = player.publisher(for: \.timeControlStatus)
             .receive(on: RunLoop.main)
             .sink { [weak self] status in
-                guard let self = self, status == .playing else { return }
+                guard let self = self else { return }
+                self.lastKnownPlaying = (status == .playing)
+                guard status == .playing else { return }
                 if !self.started {
                     self.started = true
                     self.pushHistory()
@@ -278,6 +282,15 @@ final class PlayerModel: ObservableObject {
         let session = AVAudioSession.sharedInstance()
         try? session.setCategory(.playback, mode: .moviePlayback)
         try? session.setActive(true)
+    }
+
+    /// AVKit 进出全屏会自行暂停，按"进全屏前是否在播"决定是否恢复
+    func handleFullscreen(_ active: Bool) {
+        if active {
+            wasPlayingBeforeFullscreen = lastKnownPlaying || player.timeControlStatus == .playing
+        } else if wasPlayingBeforeFullscreen {
+            player.play()
+        }
     }
 
     /// 离开页面 / 进入系统全屏时调用：保存进度并暂停，但保留 item 与播放位置。
