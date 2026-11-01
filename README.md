@@ -55,6 +55,15 @@ cargo run --release --manifest-path src-tauri/Cargo.toml --example selftest
 - 登录 Cookie：`%APPDATA%\local.ph.desktop\cookies.json`
 - 媒体缓存：`%APPDATA%\local.ph.desktop\media-cache`（退出视频或下次启动时清空）
 
+## iOS 客户端
+
+`ios/` 是对应的 **原生 iOS 版本**（SwiftUI + AVPlayer + WebKit），
+功能与桌面端对齐：首页 / 分类 / 热门 / 最新 / 搜索 / 详情、画质与倍速、
+观看历史与续播、账号登录与 Cookie 导入，以及基于本机分片缓存的「整片预缓冲」。
+
+用 Mac 上的 Xcode 打开 `ios/PornhubMobile.xcodeproj` 即可（iOS 16+，
+首次打开会自动拉取 SwiftSoup）。详细说明见 [`ios/README.md`](ios/README.md)。
+
 ## 说明
 
 - 站点对 TLS / HTTP 指纹较敏感，因此所有站点请求通过系统 `curl.exe`（Schannel）发出；使用纯 Rust TLS 栈会被返回 403 / 410。

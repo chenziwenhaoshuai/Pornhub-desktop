@@ -1,0 +1,433 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		ABCDEF000000000000000000 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF000000000000000001 /* AppModel.swift */; };
+		ABCDEF000000000000000002 /* PornhubMobileApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF000000000000000003 /* PornhubMobileApp.swift */; };
+		ABCDEF000000000000000004 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF000000000000000005 /* RootView.swift */; };
+		ABCDEF000000000000000006 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF000000000000000007 /* API.swift */; };
+		ABCDEF000000000000000008 /* Cookies.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF000000000000000009 /* Cookies.swift */; };
+		ABCDEF00000000000000000A /* Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF00000000000000000B /* Format.swift */; };
+		ABCDEF00000000000000000C /* HLSResourceLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF00000000000000000D /* HLSResourceLoader.swift */; };
+		ABCDEF00000000000000000E /* HTTP.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF00000000000000000F /* HTTP.swift */; };
+		ABCDEF000000000000000010 /* ImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF000000000000000011 /* ImageLoader.swift */; };
+		ABCDEF000000000000000012 /* MediaCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF000000000000000013 /* MediaCache.swift */; };
+		ABCDEF000000000000000014 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF000000000000000015 /* Models.swift */; };
+		ABCDEF000000000000000016 /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF000000000000000017 /* Parser.swift */; };
+		ABCDEF000000000000000018 /* Prefetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF000000000000000019 /* Prefetcher.swift */; };
+		ABCDEF00000000000000001A /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF00000000000000001B /* Settings.swift */; };
+		ABCDEF00000000000000001C /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF00000000000000001D /* Storage.swift */; };
+		ABCDEF00000000000000001E /* WebFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF00000000000000001F /* WebFetcher.swift */; };
+		ABCDEF000000000000000020 /* BrowseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF000000000000000021 /* BrowseView.swift */; };
+		ABCDEF000000000000000022 /* CategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF000000000000000023 /* CategoriesView.swift */; };
+		ABCDEF000000000000000024 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF000000000000000025 /* Components.swift */; };
+		ABCDEF000000000000000026 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF000000000000000027 /* HistoryView.swift */; };
+		ABCDEF000000000000000028 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF000000000000000029 /* HomeView.swift */; };
+		ABCDEF00000000000000002A /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF00000000000000002B /* LoginView.swift */; };
+		ABCDEF00000000000000002C /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF00000000000000002D /* PlayerView.swift */; };
+		ABCDEF00000000000000002E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF00000000000000002F /* SettingsView.swift */; };
+		ABCDEF000000000000000030 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF000000000000000031 /* Theme.swift */; };
+		ABCDEF000000000000000032 /* VideoDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF000000000000000033 /* VideoDetailView.swift */; };
+		ABCDEF000000000000000034 /* VideoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF000000000000000035 /* VideoListView.swift */; };
+		ABCDEF000000000000000036 /* WebLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF000000000000000037 /* WebLoginView.swift */; };
+		ABCDEF00000000000000003B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ABCDEF000000000000000038 /* Assets.xcassets */; };
+		ABCDEF00000000000000003C /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = ABCDEF00000000000000003D /* SwiftSoup */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		ABCDEF000000000000000001 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		ABCDEF000000000000000003 /* PornhubMobileApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PornhubMobileApp.swift; sourceTree = "<group>"; };
+		ABCDEF000000000000000005 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		ABCDEF000000000000000007 /* API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
+		ABCDEF000000000000000009 /* Cookies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cookies.swift; sourceTree = "<group>"; };
+		ABCDEF00000000000000000B /* Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Format.swift; sourceTree = "<group>"; };
+		ABCDEF00000000000000000D /* HLSResourceLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HLSResourceLoader.swift; sourceTree = "<group>"; };
+		ABCDEF00000000000000000F /* HTTP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTP.swift; sourceTree = "<group>"; };
+		ABCDEF000000000000000011 /* ImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageLoader.swift; sourceTree = "<group>"; };
+		ABCDEF000000000000000013 /* MediaCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaCache.swift; sourceTree = "<group>"; };
+		ABCDEF000000000000000015 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		ABCDEF000000000000000017 /* Parser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
+		ABCDEF000000000000000019 /* Prefetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prefetcher.swift; sourceTree = "<group>"; };
+		ABCDEF00000000000000001B /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		ABCDEF00000000000000001D /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
+		ABCDEF00000000000000001F /* WebFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebFetcher.swift; sourceTree = "<group>"; };
+		ABCDEF000000000000000021 /* BrowseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseView.swift; sourceTree = "<group>"; };
+		ABCDEF000000000000000023 /* CategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesView.swift; sourceTree = "<group>"; };
+		ABCDEF000000000000000025 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		ABCDEF000000000000000027 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		ABCDEF000000000000000029 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		ABCDEF00000000000000002B /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		ABCDEF00000000000000002D /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
+		ABCDEF00000000000000002F /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		ABCDEF000000000000000031 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		ABCDEF000000000000000033 /* VideoDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoDetailView.swift; sourceTree = "<group>"; };
+		ABCDEF000000000000000035 /* VideoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoListView.swift; sourceTree = "<group>"; };
+		ABCDEF000000000000000037 /* WebLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebLoginView.swift; sourceTree = "<group>"; };
+		ABCDEF000000000000000038 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		ABCDEF000000000000000039 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		ABCDEF00000000000000003A /* PornhubMobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PornhubMobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		ABCDEF000000000000000044 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ABCDEF00000000000000003C /* SwiftSoup in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		ABCDEF00000000000000003E /* App */ = {
+			isa = PBXGroup;
+			children = (
+				ABCDEF000000000000000001 /* AppModel.swift */,
+				ABCDEF000000000000000003 /* PornhubMobileApp.swift */,
+				ABCDEF000000000000000005 /* RootView.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		ABCDEF00000000000000003F /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				ABCDEF000000000000000007 /* API.swift */,
+				ABCDEF000000000000000009 /* Cookies.swift */,
+				ABCDEF00000000000000000B /* Format.swift */,
+				ABCDEF00000000000000000D /* HLSResourceLoader.swift */,
+				ABCDEF00000000000000000F /* HTTP.swift */,
+				ABCDEF000000000000000011 /* ImageLoader.swift */,
+				ABCDEF000000000000000013 /* MediaCache.swift */,
+				ABCDEF000000000000000015 /* Models.swift */,
+				ABCDEF000000000000000017 /* Parser.swift */,
+				ABCDEF000000000000000019 /* Prefetcher.swift */,
+				ABCDEF00000000000000001B /* Settings.swift */,
+				ABCDEF00000000000000001D /* Storage.swift */,
+				ABCDEF00000000000000001F /* WebFetcher.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		ABCDEF000000000000000040 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				ABCDEF000000000000000021 /* BrowseView.swift */,
+				ABCDEF000000000000000023 /* CategoriesView.swift */,
+				ABCDEF000000000000000025 /* Components.swift */,
+				ABCDEF000000000000000027 /* HistoryView.swift */,
+				ABCDEF000000000000000029 /* HomeView.swift */,
+				ABCDEF00000000000000002B /* LoginView.swift */,
+				ABCDEF00000000000000002D /* PlayerView.swift */,
+				ABCDEF00000000000000002F /* SettingsView.swift */,
+				ABCDEF000000000000000031 /* Theme.swift */,
+				ABCDEF000000000000000033 /* VideoDetailView.swift */,
+				ABCDEF000000000000000035 /* VideoListView.swift */,
+				ABCDEF000000000000000037 /* WebLoginView.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		ABCDEF000000000000000041 /* PornhubMobile */ = {
+			isa = PBXGroup;
+			children = (
+				ABCDEF00000000000000003E /* App */,
+				ABCDEF00000000000000003F /* Core */,
+				ABCDEF000000000000000040 /* UI */,
+				ABCDEF000000000000000038 /* Assets.xcassets */,
+				ABCDEF000000000000000039 /* Info.plist */,
+			);
+			path = PornhubMobile;
+			sourceTree = "<group>";
+		};
+		ABCDEF000000000000000042 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				ABCDEF00000000000000003A /* PornhubMobile.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		ABCDEF000000000000000043 = {
+			isa = PBXGroup;
+			children = (
+				ABCDEF000000000000000041 /* PornhubMobile */,
+				ABCDEF000000000000000042 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		ABCDEF000000000000000045 /* PornhubMobile */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ABCDEF000000000000000046 /* Build configuration list for PBXNativeTarget "PornhubMobile" */;
+			buildPhases = (
+				ABCDEF000000000000000047 /* Sources */,
+				ABCDEF000000000000000044 /* Frameworks */,
+				ABCDEF000000000000000048 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PornhubMobile;
+			packageProductDependencies = (
+				ABCDEF00000000000000003D /* SwiftSoup */,
+			);
+			productName = PornhubMobile;
+			productReference = ABCDEF00000000000000003A /* PornhubMobile.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		ABCDEF000000000000000049 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					ABCDEF000000000000000045 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = ABCDEF00000000000000004A /* Build configuration list for PBXProject "PornhubMobile" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				"zh-Hans",
+			);
+			mainGroup = ABCDEF000000000000000043;
+			productRefGroup = ABCDEF000000000000000042 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				ABCDEF000000000000000045 /* PornhubMobile */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		ABCDEF000000000000000048 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ABCDEF00000000000000003B /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		ABCDEF000000000000000047 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ABCDEF000000000000000000 /* AppModel.swift in Sources */,
+				ABCDEF000000000000000002 /* PornhubMobileApp.swift in Sources */,
+				ABCDEF000000000000000004 /* RootView.swift in Sources */,
+				ABCDEF000000000000000006 /* API.swift in Sources */,
+				ABCDEF000000000000000008 /* Cookies.swift in Sources */,
+				ABCDEF00000000000000000A /* Format.swift in Sources */,
+				ABCDEF00000000000000000C /* HLSResourceLoader.swift in Sources */,
+				ABCDEF00000000000000000E /* HTTP.swift in Sources */,
+				ABCDEF000000000000000010 /* ImageLoader.swift in Sources */,
+				ABCDEF000000000000000012 /* MediaCache.swift in Sources */,
+				ABCDEF000000000000000014 /* Models.swift in Sources */,
+				ABCDEF000000000000000016 /* Parser.swift in Sources */,
+				ABCDEF000000000000000018 /* Prefetcher.swift in Sources */,
+				ABCDEF00000000000000001A /* Settings.swift in Sources */,
+				ABCDEF00000000000000001C /* Storage.swift in Sources */,
+				ABCDEF00000000000000001E /* WebFetcher.swift in Sources */,
+				ABCDEF000000000000000020 /* BrowseView.swift in Sources */,
+				ABCDEF000000000000000022 /* CategoriesView.swift in Sources */,
+				ABCDEF000000000000000024 /* Components.swift in Sources */,
+				ABCDEF000000000000000026 /* HistoryView.swift in Sources */,
+				ABCDEF000000000000000028 /* HomeView.swift in Sources */,
+				ABCDEF00000000000000002A /* LoginView.swift in Sources */,
+				ABCDEF00000000000000002C /* PlayerView.swift in Sources */,
+				ABCDEF00000000000000002E /* SettingsView.swift in Sources */,
+				ABCDEF000000000000000030 /* Theme.swift in Sources */,
+				ABCDEF000000000000000032 /* VideoDetailView.swift in Sources */,
+				ABCDEF000000000000000034 /* VideoListView.swift in Sources */,
+				ABCDEF000000000000000036 /* WebLoginView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		ABCDEF00000000000000004B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		ABCDEF00000000000000004C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				ENABLE_NS_ASSERTIONS = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		ABCDEF00000000000000004D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = PornhubMobile/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+				"$(inherited)",
+				"@executable_path/Frameworks",
+			);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = local.ph.mobile;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		ABCDEF00000000000000004E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = PornhubMobile/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+				"$(inherited)",
+				"@executable_path/Frameworks",
+			);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = local.ph.mobile;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		ABCDEF00000000000000004A /* Build configuration list for PBXProject "PornhubMobile" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ABCDEF00000000000000004B /* Debug */,
+				ABCDEF00000000000000004C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		ABCDEF000000000000000046 /* Build configuration list for PBXNativeTarget "PornhubMobile" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ABCDEF00000000000000004D /* Debug */,
+				ABCDEF00000000000000004E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		ABCDEF00000000000000004F /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.7.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		ABCDEF00000000000000003D /* SwiftSoup */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = ABCDEF00000000000000004F /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = ABCDEF000000000000000049 /* Project object */;
+}

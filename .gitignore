@@ -15,3 +15,10 @@ Thumbs.db
 # Local runtime data (never committed)
 *.cookies.json
 settings.json
+
+# Xcode / iOS build output
+ios/**/xcuserdata/
+ios/**/*.xcuserstate
+ios/build/
+ios/DerivedData/
+ios/.build/
