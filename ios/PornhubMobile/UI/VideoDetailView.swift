@@ -33,8 +33,6 @@ struct PrefetchNoteView: View {
     @ObservedObject var prefetcher: Prefetcher
     var fallback: String = ""
 
-    @State private var isFullscreen = false
-
     var body: some View {
         let text = content
         if !text.isEmpty {
@@ -64,6 +62,7 @@ struct PrefetchNoteView: View {
 
 @MainActor
 struct VideoDetailView: View {
+    @State private var isFullscreen = false
     let vkey: String
 
     @EnvironmentObject private var model: AppModel
