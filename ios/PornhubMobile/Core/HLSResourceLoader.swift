@@ -213,9 +213,7 @@ final class HLSResourceLoader: NSObject, AVAssetResourceLoaderDelegate {
             return Payload(data: data, contentType: cached.contentType, isPlaylist: isPlaylist, remote: remote)
         }
 
-        let response = try await http.request("GET", remote,
-                                              headers: ["Accept": "*/*"],
-                                              cachePolicy: .reloadIgnoringLocalCacheData)
+        let response = try await fetchMedia(remote)
         guard (200..<300).contains(response.status) else {
             LoaderDiagnostics.shared.record("HTTP \(response.status) \(remote)")
             throw AppError("视频分片返回 HTTP \(response.status)")
@@ -238,6 +236,28 @@ final class HLSResourceLoader: NSObject, AVAssetResourceLoaderDelegate {
         }
 
         return Payload(data: data, contentType: contentType, isPlaylist: isPlaylist, remote: remote)
+    }
+
+    /// 先按站点请求头（Chrome UA + Referer）取流；被拒时退回与 AVPlayer 一致的请求头（无 Referer）。
+    /// 直连播放之所以能成，走的就是 AVFoundation 自己的这套头。
+    private func fetchMedia(_ remote: String) async throws -> HTTPResponse {
+        do {
+            let response = try await http.request("GET", remote,
+                                                  headers: ["Accept": "*/*"],
+                                                  cachePolicy: .reloadIgnoringLocalCacheData)
+            if (200..<300).contains(response.status) { return response }
+            LoaderDiagnostics.shared.record("首次请求 HTTP \(response.status)，改用 AVPlayer 请求头重试")
+        } catch {
+            LoaderDiagnostics.shared.record("首次请求失败：\(error.localizedDescription)，改用 AVPlayer 请求头重试")
+        }
+
+        return try await http.request(
+            "GET", remote,
+            headers: ["Accept": "*/*"],
+            cachePolicy: .reloadIgnoringLocalCacheData,
+            referer: "",
+            userAgent: "AppleCoreMedia/1.0.0 (iPhone; CPU iPhone OS 26_6 like Mac OS X; zh_CN)"
+        )
     }
 
     private func finish(_ request: AVAssetResourceLoadingRequest,

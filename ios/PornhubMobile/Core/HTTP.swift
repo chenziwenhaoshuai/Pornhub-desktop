@@ -93,7 +93,9 @@ final class HTTPClient {
                  _ urlString: String,
                  headers: [String: String] = [:],
                  body: Data? = nil,
-                 cachePolicy: URLRequest.CachePolicy? = nil) async throws -> HTTPResponse {
+                 cachePolicy: URLRequest.CachePolicy? = nil,
+                 referer refererOverride: String? = nil,
+                 userAgent: String? = nil) async throws -> HTTPResponse {
         guard let url = URL(string: urlString) else {
             throw AppError("地址无效：\(urlString)")
         }
@@ -104,8 +106,11 @@ final class HTTPClient {
         if let cachePolicy = cachePolicy {
             request.cachePolicy = cachePolicy
         }
-        request.setValue(HTTPClient.userAgent, forHTTPHeaderField: "User-Agent")
-        request.setValue(referer, forHTTPHeaderField: "Referer")
+        request.setValue(userAgent ?? HTTPClient.userAgent, forHTTPHeaderField: "User-Agent")
+        let effectiveReferer = refererOverride ?? referer
+        if !effectiveReferer.isEmpty {
+            request.setValue(effectiveReferer, forHTTPHeaderField: "Referer")
+        }
         request.setValue("zh-CN,zh;q=0.9,en;q=0.8", forHTTPHeaderField: "Accept-Language")
         for (name, value) in headers {
             request.setValue(value, forHTTPHeaderField: name)
