@@ -110,7 +110,9 @@ final class PlayerModel: ObservableObject {
             loader = resourceLoader
             item = AVPlayerItem(asset: asset)
         } else if let url = URL(string: source.url) {
-            item = AVPlayerItem(url: url)
+            // 直连也必须带上站点请求头：CDN 会校验 Referer / UA / Cookie，
+            // 否则 m3u8 能下载（预缓冲走 HTTPClient）但 AVPlayer 拒绝播放。
+            item = AVPlayerItem(asset: PlayerModel.makeAsset(url: url, http: http))
         } else {
             errorMessage = "播放地址无效"
             return
@@ -125,6 +127,26 @@ final class PlayerModel: ObservableObject {
         if cacheEnabled && prefetchEnabled, let http = http {
             prefetcher?.start(url: source.url, http: http)
         }
+    }
+
+    /// 给 AVPlayer 的请求注入与站点一致的头部（AVFoundation 原生请求默认不带 Referer）。
+    static func makeAsset(url: URL, http: HTTPClient?) -> AVURLAsset {
+        guard let http else { return AVURLAsset(url: url) }
+        var headers: [String: String] = [
+            "Referer": http.referer,
+            "User-Agent": HTTPClient.userAgent,
+            "Accept": "*/*",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"
+        ]
+        if let origin = URL(string: http.referer)?.scheme, let host = URL(string: http.referer)?.host {
+            headers["Origin"] = "\(origin)://\(host)"
+        }
+        var options: [String: Any] = ["AVURLAssetHTTPHeaderFieldsKey": headers]
+        let cookies = HTTPCookieStorage.shared.cookies ?? []
+        if !cookies.isEmpty {
+            options["AVURLAssetHTTPCookiesKey"] = cookies
+        }
+        return AVURLAsset(url: url, options: options)
     }
 
     private func observe(item: AVPlayerItem, index: Int) {
