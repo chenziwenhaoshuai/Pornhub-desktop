@@ -280,6 +280,15 @@ final class PlayerModel: ObservableObject {
         try? session.setActive(true)
     }
 
+    /// 离开页面 / 进入系统全屏时调用：保存进度并暂停，但保留 item 与播放位置。
+    /// 不能用 destroy()，否则全屏返回后会被重新解析、从头播放。
+    func pauseKeepingPosition() {
+        if player.currentItem != nil {
+            pushHistory()
+            player.pause()
+        }
+    }
+
     func destroy() {
         prefetcher?.stop()
         removePeriodicObserver()

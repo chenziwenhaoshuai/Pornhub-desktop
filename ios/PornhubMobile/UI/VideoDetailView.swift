@@ -102,10 +102,14 @@ struct VideoDetailView: View {
         .navigationTitle(vm.detail?.displayTitle ?? "视频")
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            await reload(force: false)
+            // 系统全屏会触发一次 disappear/appear，已有数据时不要重新解析
+            if vm.detail == nil {
+                await reload(force: false)
+            }
         }
         .onDisappear {
-            vm.player.destroy()
+            // 只暂停并保存进度：destroy 会导致全屏返回后从头播放
+            vm.player.pauseKeepingPosition()
             model.dropMediaCacheSilently()
         }
     }
