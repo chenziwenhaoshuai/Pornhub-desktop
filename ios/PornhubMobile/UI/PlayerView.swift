@@ -98,7 +98,9 @@ final class PlayerModel: ObservableObject {
         LoaderDiagnostics.shared.reset()
 
         let source = sources[index]
-        let cacheEnabled = useCache && !forceDirect && source.isHLS
+        // HLS 的分片请求无法经过 AVAssetResourceLoader（系统返回 -12881
+        // "custom url not redirect"），因此本地缓存播放暂不启用，统一直连。
+        let cacheEnabled = false && useCache && !forceDirect && source.isHLS
 
         let item: AVPlayerItem
         if cacheEnabled, let http = http, let assetURL = HLSResourceLoader.assetURL(for: source.url) {

@@ -13,7 +13,7 @@ struct AppSettings: Codable, Equatable {
     /// 点开视频后后台把整部视频缓存到本机（对应桌面端的“整片预缓冲”）。
     var prefetch: Bool = true
     /// 播放时走本地分片缓存；关闭则直接播上游 HLS 地址。
-    var playCache: Bool = true
+    var playCache: Bool = false
 
     enum CodingKeys: String, CodingKey {
         case domain
@@ -32,7 +32,7 @@ struct AppSettings: Codable, Equatable {
         proxy = try container.decodeIfPresent(ProxyConfig.self, forKey: .proxy) ?? fallback.proxy
         accountName = try container.decodeIfPresent(String.self, forKey: .accountName) ?? ""
         prefetch = try container.decodeIfPresent(Bool.self, forKey: .prefetch) ?? true
-        playCache = try container.decodeIfPresent(Bool.self, forKey: .playCache) ?? true
+        playCache = try container.decodeIfPresent(Bool.self, forKey: .playCache) ?? false
     }
 
     func normalized() -> AppSettings {

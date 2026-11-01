@@ -96,10 +96,6 @@ struct SettingsView: View {
     private var playbackSection: some View {
         Section {
             Group {
-                Toggle("整片预缓冲（缓存加速）", isOn: $playCache)
-                if playCache {
-                    Toggle("点开视频后下载整片", isOn: $prefetch)
-                }
                 HStack {
                     Text("视频缓存")
                     Spacer()
@@ -116,7 +112,7 @@ struct SettingsView: View {
         } header: {
             Text("播放与缓存")
         } footer: {
-            Text("开启后视频通过本地分片缓存播放，同时后台尽可能把整部视频下载到本机，拖动进度条几乎无需等待。离开视频页或下次启动会自动清理。关闭则直接播放上游地址：最稳，但拖动较慢。")
+            Text("iOS 上 HLS 分片无法经过 AVAssetResourceLoader（系统限制），本地缓存播放暂不可用，当前一律直连播放。这里只保留缓存占用信息与清理入口。")
         }
     }
 
