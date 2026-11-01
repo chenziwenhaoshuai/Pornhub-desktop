@@ -22,3 +22,6 @@ ios/**/*.xcuserstate
 ios/build/
 ios/DerivedData/
 ios/.build/
+
+# 本地并行开发的另一个仓库
+/Ziwen-Player/
