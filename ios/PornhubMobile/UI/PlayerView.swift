@@ -19,6 +19,7 @@ final class PlayerModel: ObservableObject {
 
     @Published var note: String = ""
     @Published var errorMessage: String?
+    @Published var diagnostic: String = ""
     @Published var sourceIndex: Int = 0
     @Published var rate: Double = 1
 
@@ -93,6 +94,8 @@ final class PlayerModel: ObservableObject {
         statusSink = nil
         controlSink = nil
         loader = nil
+        diagnostic = ""
+        LoaderDiagnostics.shared.reset()
 
         let source = sources[index]
         let cacheEnabled = useCache && !forceDirect && source.isHLS
@@ -132,9 +135,18 @@ final class PlayerModel: ObservableObject {
                     self.applyResume()
                 case .failed:
                     let message = item.error?.localizedDescription ?? "视频加载失败"
+                    let nsError = item.error as NSError?
+                    let code = nsError.map { "\($0.domain) #\($0.code)" } ?? "未知错误"
+                    let logText = (item.errorLog()?.events ?? [])
+                        .map { "\($0.errorStatusCode) \($0.errorComment ?? "")" }
+                        .joined(separator: " | ")
+                    let detail = "\(message) [\(code)] 解析器: \(LoaderDiagnostics.shared.lastMessage) 日志: \(logText)"
+                    self.diagnostic = detail
+                    NSLog("[PHPlayer] %@", detail)
+
                     if self.useCache && !self.usedFallback {
                         self.usedFallback = true
-                        self.note = "缓存模式加载失败，已切换为直连播放"
+                        self.note = "缓存模式加载失败（\(code)），已切换为直连播放"
                         self.load(index: index, forceDirect: true)
                     } else {
                         self.errorMessage = message

@@ -67,6 +67,34 @@ enum PlaylistRewriter {
     }
 }
 
+/// 播放链路诊断：缓存模式失败时把真实原因带到 UI / 系统日志里。
+final class LoaderDiagnostics {
+    static let shared = LoaderDiagnostics()
+
+    private let lock = NSLock()
+    private var messages: [String] = []
+
+    var lastMessage: String {
+        lock.lock()
+        defer { lock.unlock() }
+        return messages.last ?? ""
+    }
+
+    func record(_ text: String) {
+        lock.lock()
+        messages.append(text)
+        if messages.count > 40 { messages.removeFirst(messages.count - 40) }
+        lock.unlock()
+        NSLog("[PHLoader] %@", text)
+    }
+
+    func reset() {
+        lock.lock()
+        messages.removeAll()
+        lock.unlock()
+    }
+}
+
 /// 播放时的分片提供者：先查本地缓存，缺失时回源下载并写入缓存。
 /// 这样只要预缓冲跑过，拖动进度条基本不用等。
 final class HLSResourceLoader: NSObject, AVAssetResourceLoaderDelegate {
@@ -158,6 +186,7 @@ final class HLSResourceLoader: NSObject, AVAssetResourceLoaderDelegate {
                                 length: allToEnd ? 0 : requestedLength)
                 }
             } catch {
+                LoaderDiagnostics.shared.record("取流失败 \(remote)：\(error.localizedDescription)")
                 self.queue.async {
                     guard !self.isCancelled(request) else { return }
                     request.finishLoading(with: error as NSError)
@@ -170,6 +199,7 @@ final class HLSResourceLoader: NSObject, AVAssetResourceLoaderDelegate {
         var data: Data
         var contentType: String
         var isPlaylist: Bool
+        var remote: String
     }
 
     private func load(remote: String) async throws -> Payload {
@@ -180,13 +210,14 @@ final class HLSResourceLoader: NSObject, AVAssetResourceLoaderDelegate {
                 let text = String(decoding: data, as: UTF8.self)
                 data = Data(PlaylistRewriter.rewrite(text, base: remote).utf8)
             }
-            return Payload(data: data, contentType: cached.contentType, isPlaylist: isPlaylist)
+            return Payload(data: data, contentType: cached.contentType, isPlaylist: isPlaylist, remote: remote)
         }
 
         let response = try await http.request("GET", remote,
                                               headers: ["Accept": "*/*"],
                                               cachePolicy: .reloadIgnoringLocalCacheData)
         guard (200..<300).contains(response.status) else {
+            LoaderDiagnostics.shared.record("HTTP \(response.status) \(remote)")
             throw AppError("视频分片返回 HTTP \(response.status)")
         }
 
@@ -197,12 +228,16 @@ final class HLSResourceLoader: NSObject, AVAssetResourceLoaderDelegate {
 
         if isPlaylist {
             let text = String(decoding: data, as: UTF8.self)
-            data = Data(PlaylistRewriter.rewrite(text, base: remote).utf8)
+            // 关键：必须用重定向后的最终地址做相对路径基准。
+            // 站点 master.m3u8 常 302 到 CDN，用原始地址会拼出错误的分片 host。
+            let base = response.url.absoluteString.isEmpty ? remote : response.url.absoluteString
+            data = Data(PlaylistRewriter.rewrite(text, base: base).utf8)
+            LoaderDiagnostics.shared.record("播放列表 \(remote) -> base \(base)")
         } else {
             cache.store(remote, status: response.status, contentType: contentType, data: data)
         }
 
-        return Payload(data: data, contentType: contentType, isPlaylist: isPlaylist)
+        return Payload(data: data, contentType: contentType, isPlaylist: isPlaylist, remote: remote)
     }
 
     private func finish(_ request: AVAssetResourceLoadingRequest,
@@ -213,9 +248,11 @@ final class HLSResourceLoader: NSObject, AVAssetResourceLoaderDelegate {
 
         if let info = request.contentInformationRequest {
             info.contentType = HLSResourceLoader.uti(contentType: payload.contentType,
-                                                     playlist: payload.isPlaylist)
+                                                     playlist: payload.isPlaylist,
+                                                     remote: payload.remote)
             info.contentLength = Int64(data.count)
-            info.isByteRangeAccessSupported = true
+            // m3u8 不支持 byte-range；分片由我们自己切片返回
+            info.isByteRangeAccessSupported = !payload.isPlaylist
         }
 
         guard let dataRequest = request.dataRequest else {
@@ -246,14 +283,24 @@ final class HLSResourceLoader: NSObject, AVAssetResourceLoaderDelegate {
         return text.contains("#EXTM3U")
     }
 
-    static func uti(contentType: String, playlist: Bool) -> String {
-        if playlist { return "public.mpegurl" }
+    static func uti(contentType: String, playlist: Bool, remote: String = "") -> String {
+        // 注意：iOS 系统里没有 "public.mpegurl" 这个 UTI，
+        // m3u8 对应的真实 UTI 是 "public.m3u-playlist"。写错会导致
+        // AVPlayerItem 直接 failed（表现为“无可用资源”，随后回退直连）。
+        if playlist { return "public.m3u-playlist" }
         let lower = contentType.lowercased()
-        if lower.contains("mpegurl") { return "public.mpegurl" }
+        if lower.contains("mpegurl") || lower.contains("m3u8") { return "public.m3u-playlist" }
         if lower.contains("mp2t") || lower.contains("transport") { return "public.mpeg-2-transport-stream" }
         if lower.contains("mp4") { return "public.mpeg-4" }
         if lower.contains("aac") { return "public.aac-audio" }
         if lower.contains("mp3") { return "public.mp3" }
+
+        // 服务器常把分片标成 application/octet-stream，按扩展名兜底
+        let path = remote.lowercased().split(separator: "?").first.map(String.init) ?? remote.lowercased()
+        if path.hasSuffix(".ts") { return "public.mpeg-2-transport-stream" }
+        if path.hasSuffix(".m4s") || path.hasSuffix(".m4v") || path.hasSuffix(".mp4") { return "public.mpeg-4" }
+        if path.hasSuffix(".aac") { return "public.aac-audio" }
+        if path.hasSuffix(".key") { return "public.data" }
         return "public.data"
     }
 }
