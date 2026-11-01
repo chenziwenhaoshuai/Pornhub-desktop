@@ -33,6 +33,8 @@ struct PrefetchNoteView: View {
     @ObservedObject var prefetcher: Prefetcher
     var fallback: String = ""
 
+    @State private var isFullscreen = false
+
     var body: some View {
         let text = content
         if !text.isEmpty {
@@ -108,9 +110,15 @@ struct VideoDetailView: View {
             }
         }
         .onDisappear {
-            // 只暂停并保存进度：destroy 会导致全屏返回后从头播放
-            vm.player.pauseKeepingPosition()
             model.dropMediaCacheSilently()
+            // 系统全屏也会触发 onDisappear，且回调顺序不保证，
+            // 所以延迟 350ms 再判断：全屏中就不暂停，真正离开页面才暂停并保存进度。
+            Task {
+                try? await Task.sleep(nanoseconds: 350_000_000)
+                if !isFullscreen {
+                    vm.player.pauseKeepingPosition()
+                }
+            }
         }
     }
 
@@ -120,7 +128,9 @@ struct VideoDetailView: View {
         VStack(spacing: 0) {
             Color.black
                 .aspectRatio(16.0 / 9.0, contentMode: .fit)
-                .overlay(PlayerSurface(player: vm.player.player))
+                .overlay(PlayerSurface(player: vm.player.player) { fullscreen in
+                    isFullscreen = fullscreen
+                })
 
             if let failure = vm.player.errorMessage {
                 HStack(spacing: 8) {

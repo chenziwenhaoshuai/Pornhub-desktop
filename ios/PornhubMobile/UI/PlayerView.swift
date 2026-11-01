@@ -305,6 +305,13 @@ final class PlayerModel: ObservableObject {
 @MainActor
 struct PlayerSurface: UIViewControllerRepresentable {
     let player: AVPlayer
+    /// 全屏状态变化回调：全屏会触发 SwiftUI 的 onDisappear，
+    /// 需要用这个标记区分"真离开页面"和"只是进了系统全屏"。
+    var onFullscreenChange: (Bool) -> Void = { _ in }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onFullscreenChange: onFullscreenChange)
+    }
 
     func makeUIViewController(context: Context) -> AVPlayerViewController {
         let controller = AVPlayerViewController()
@@ -314,12 +321,35 @@ struct PlayerSurface: UIViewControllerRepresentable {
         controller.canStartPictureInPictureAutomaticallyFromInline = true
         controller.videoGravity = .resizeAspect
         controller.updatesNowPlayingInfoCenter = true
+        controller.delegate = context.coordinator
         return controller
     }
 
     func updateUIViewController(_ controller: AVPlayerViewController, context: Context) {
         if controller.player !== player {
             controller.player = player
+        }
+    }
+
+    final class Coordinator: NSObject, AVPlayerViewControllerDelegate {
+        private let onFullscreenChange: (Bool) -> Void
+
+        init(onFullscreenChange: @escaping (Bool) -> Void) {
+            self.onFullscreenChange = onFullscreenChange
+        }
+
+        func playerViewController(
+            _ playerViewController: AVPlayerViewController,
+            willBeginFullScreenPresentationWithAnimationCoordinator coordinator: UIViewControllerTransitionCoordinator
+        ) {
+            onFullscreenChange(true)
+        }
+
+        func playerViewController(
+            _ playerViewController: AVPlayerViewController,
+            willEndFullScreenPresentationWithAnimationCoordinator coordinator: UIViewControllerTransitionCoordinator
+        ) {
+            onFullscreenChange(false)
         }
     }
 }
