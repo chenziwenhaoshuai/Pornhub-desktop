@@ -33,15 +33,38 @@ impl Response {
     }
 }
 
-fn gate() -> &'static Semaphore {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RequestKind {
+    Default,
+    Image,
+}
+
+fn media_gate() -> &'static Semaphore {
     static GATE: OnceLock<Semaphore> = OnceLock::new();
-    GATE.get_or_init(|| Semaphore::new(10))
+    GATE.get_or_init(|| Semaphore::new(12))
+}
+
+fn image_gate() -> &'static Semaphore {
+    static GATE: OnceLock<Semaphore> = OnceLock::new();
+    GATE.get_or_init(|| Semaphore::new(6))
 }
 
 fn temp_dir() -> PathBuf {
     let dir = std::env::temp_dir().join("ph-desktop-http");
     let _ = std::fs::create_dir_all(&dir);
     dir
+}
+
+pub fn clean_temp_dir() {
+    let dir = temp_dir();
+    if let Ok(entries) = std::fs::read_dir(dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_file() {
+                let _ = std::fs::remove_file(path);
+            }
+        }
+    }
 }
 
 fn curl_path() -> String {
@@ -56,9 +79,13 @@ fn curl_path() -> String {
     #[cfg(windows)]
     {
         if let Ok(sysroot) = std::env::var("SystemRoot") {
-            let path = PathBuf::from(sysroot).join("System32").join("curl.exe");
+            let path = PathBuf::from(&sysroot).join("System32").join("curl.exe");
             if path.is_file() {
                 return path.to_string_lossy().into_owned();
+            }
+            let syswow = PathBuf::from(&sysroot).join("SysWOW64").join("curl.exe");
+            if syswow.is_file() {
+                return syswow.to_string_lossy().into_owned();
             }
         }
         let fallback = PathBuf::from(r"C:\Windows\System32\curl.exe");
@@ -98,7 +125,22 @@ pub async fn request(
     headers: &[(String, String)],
     body: Option<&[u8]>,
 ) -> Result<Response, String> {
-    let _permit = gate()
+    request_with_kind(settings, method, url, headers, body, RequestKind::Default).await
+}
+
+pub async fn request_with_kind(
+    settings: &Settings,
+    method: &str,
+    url: &str,
+    headers: &[(String, String)],
+    body: Option<&[u8]>,
+    kind: RequestKind,
+) -> Result<Response, String> {
+    let gate = match kind {
+        RequestKind::Image => image_gate(),
+        RequestKind::Default => media_gate(),
+    };
+    let _permit = gate
         .acquire()
         .await
         .map_err(|_| "请求队列已关闭".to_string())?;

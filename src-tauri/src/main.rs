@@ -1,6 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use ph_desktop::{api, cache, config, cookies, media, net, prefetch};
+use ph_desktop::{api, cache, config, cookies, media, net, prefetch, transport};
 use api::{Account, Challenge, LoginOutcome};
 use cache::DiskCache;
 use config::Settings;
@@ -24,7 +24,7 @@ struct AppState {
     cache: Mutex<HashMap<String, (Instant, Value)>>,
 }
 
-const CACHE_TTL: Duration = Duration::from_secs(180);
+const CACHE_TTL: Duration = Duration::from_secs(3600);
 
 impl AppState {
     async fn settings(&self) -> Settings {
@@ -303,6 +303,7 @@ fn main() {
             // leftovers from the previous run before the window opens.
             let disk_cache = Arc::new(DiskCache::new(dir.join("media-cache")));
             disk_cache.clear();
+            transport::clean_temp_dir();
 
             let prefetch = Arc::new(Prefetch::new(
                 disk_cache.clone(),

@@ -328,12 +328,13 @@ async fn image_handler(
         request_headers.push(("Cookie".to_string(), cookie));
     }
 
-    let response = match transport::request(
+    let response = match transport::request_with_kind(
         &settings,
         "GET",
         upstream.as_str(),
         &request_headers,
         None,
+        transport::RequestKind::Image,
     )
     .await
     {

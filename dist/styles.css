@@ -168,6 +168,7 @@ a { color: inherit; text-decoration: none; }
   outline: none;
   scroll-behavior: smooth;
 }
+.view-pane { width: 100%; }
 .view-inner { max-width: 1560px; margin: 0 auto; }
 
 .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }

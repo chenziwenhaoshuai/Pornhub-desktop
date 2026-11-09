@@ -7,6 +7,8 @@
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
   const view = $('#view');
+  const homePane = $('#homePane');
+  const subPane = $('#subPane');
   const S = {
     settings: null,
     mediaBase: '',
@@ -15,6 +17,8 @@
     stack: [],
     index: -1,
     seq: 0,
+    homeRendered: false,
+    homeScrollTop: 0,
   };
 
   const HISTORY_KEY = 'ph.history.v1';
@@ -112,13 +116,14 @@
 
   /* ------------------------------ data layer ------------------------------ */
 
-  const CACHE_TTL = 120000;
+  const CACHE_TTL = 30 * 60 * 1000;
 
   async function cached(command, args, key, force) {
     const now = Date.now();
     if (!force) {
       const hit = memoryCache.get(key);
-      if (hit && now - hit.at < CACHE_TTL) return hit.value;
+      const ttl = key === 'home' ? Infinity : CACHE_TTL;
+      if (hit && (ttl === Infinity || now - hit.at < ttl)) return hit.value;
     }
     const value = await invoke(command, args);
     memoryCache.set(key, { at: now, value });
@@ -127,6 +132,7 @@
 
   function clearClientCache() {
     memoryCache.clear();
+    S.homeRendered = false;
   }
 
   /* ------------------------------- history ------------------------------- */
@@ -237,12 +243,41 @@
     }
   }
 
+  function restoreScroll(top) {
+    const prev = view.style.scrollBehavior;
+    view.style.scrollBehavior = 'auto';
+    view.scrollTop = top;
+    requestAnimationFrame(() => {
+      view.scrollTop = top;
+      view.style.scrollBehavior = prev;
+    });
+  }
+
+  function updateHomeContinueWatching() {
+    const box = $('#homeContinueSection', homePane);
+    if (!box) return;
+    const history = getHistory()
+      .filter((x) => x.position > 10)
+      .slice(0, 8);
+    box.innerHTML = history.length
+      ? `<div class="section-title">继续观看<span class="rule"></span><button class="btn small ghost" data-act="history">全部历史</button></div>
+         <div class="grid">${history
+           .map((h) => card(h, { progress: h.position }))
+           .join('')}</div>`
+      : '';
+  }
+
   async function render({ force = false } = {}) {
     const seq = ++S.seq;
     const route = S.stack[S.index];
     if (!route) return;
     const previous = S.route;
     S.route = route;
+
+    if (previous && previous.name === 'home') {
+      S.homeScrollTop = view.scrollTop;
+    }
+
     destroyPlayer();
     if (previous && previous.name === 'video') {
       // Leaving a video: stop the background download and drop its cache so the
@@ -259,7 +294,34 @@
       }
     }
     updateChrome();
-    view.scrollTop = 0;
+
+    if (route.name === 'home') {
+      if (S.homeRendered && !force) {
+        subPane.style.display = 'none';
+        subPane.innerHTML = '';
+        homePane.style.display = '';
+        updateHomeContinueWatching();
+        restoreScroll(S.homeScrollTop || 0);
+        return;
+      }
+
+      subPane.style.display = 'none';
+      subPane.innerHTML = '';
+      homePane.style.display = '';
+      S.homeScrollTop = 0;
+      restoreScroll(0);
+      try {
+        await renderHome(route.params || {}, seq, force);
+        if (seq === S.seq) S.homeRendered = true;
+      } catch (err) {
+        if (seq === S.seq) stateError(String(err && err.message ? err.message : err));
+      }
+      return;
+    }
+
+    homePane.style.display = 'none';
+    subPane.style.display = '';
+    restoreScroll(0);
     const fn = RENDERERS[route.name];
     if (!fn) return;
     try {
@@ -363,7 +425,8 @@
   }
 
   function stateError(message) {
-    view.innerHTML = `<div class="view-inner">${stateBox(
+    const pane = S.route && S.route.name === 'home' ? homePane : subPane;
+    pane.innerHTML = `<div class="view-inner">${stateBox(
       '加载失败',
       message || '请稍后重试',
       `<button class="btn" data-act="retry">重试</button>
@@ -372,7 +435,8 @@
   }
 
   function stateEmpty(message, hint = '') {
-    view.innerHTML = `<div class="view-inner">${stateBox(message, hint, `<button class="btn" data-act="home">回到首页</button>`)}</div>`;
+    const pane = S.route && S.route.name === 'home' ? homePane : subPane;
+    pane.innerHTML = `<div class="view-inner">${stateBox(message, hint, `<button class="btn" data-act="home">回到首页</button>`)}</div>`;
   }
 
   function pageButtons(current, pages) {
@@ -397,7 +461,7 @@
   /* ------------------------------- pages ------------------------------- */
 
   async function renderHome(params, seq, force) {
-    view.innerHTML = `<div class="view-inner">${skeletonGrid(14)}</div>`;
+    homePane.innerHTML = `<div class="view-inner">${skeletonGrid(14)}</div>`;
     let data;
     try {
       data = await cached('get_home', { force: !!force }, 'home', force);
@@ -420,7 +484,7 @@
       .filter((x) => x.position > 10)
       .slice(0, 8);
 
-    view.innerHTML = `<div class="view-inner">
+    homePane.innerHTML = `<div class="view-inner">
       <div class="hero" data-vkey="${esc(hero.vkey)}" data-title="${esc(hero.title)}">
         <div class="hero-img" style="background-image:url('${esc(imgUrl(hero.thumb))}')"></div>
         <div class="hero-body">
@@ -437,6 +501,7 @@
           </div>
         </div>
       </div>
+      <div id="homeContinueSection">
       ${
         history.length
           ? `<div class="section-title">继续观看<span class="rule"></span><button class="btn small ghost" data-act="history">全部历史</button></div>
@@ -445,13 +510,14 @@
                .join('')}</div>`
           : ''
       }
+      </div>
       <div class="section-title">为你推荐<span class="rule"></span></div>
       <div class="grid">${rest.map((item) => card(item)).join('')}</div>
     </div>`;
   }
 
   async function renderCategories(params, seq, force) {
-    view.innerHTML = `<div class="view-inner">
+    subPane.innerHTML = `<div class="view-inner">
       <div class="page-head"><div><h1 class="page-title">全部分类</h1><div class="page-sub">按类别浏览视频</div></div></div>
       ${skeletonGrid(18)}
     </div>`;
@@ -468,7 +534,7 @@
       stateEmpty('没有读取到分类', '站点可能临时限制了访问，稍后再试。');
       return;
     }
-    view.innerHTML = `<div class="view-inner">
+    subPane.innerHTML = `<div class="view-inner">
       <div class="page-head"><div><h1 class="page-title">全部分类</h1><div class="page-sub">共 ${items.length} 个分类</div></div>
         <button class="btn small ghost" data-act="refresh-cats">${icons('refresh')} 刷新</button>
       </div>
@@ -498,7 +564,7 @@
     const page = params.page || 1;
     const navKey = params.nav || '';
     const heading = params.title || '';
-    view.innerHTML = `<div class="view-inner">
+    subPane.innerHTML = `<div class="view-inner">
       <div class="page-head"><div><h1 class="page-title">${esc(heading || '视频列表')}</h1><div class="page-sub">加载中…</div></div></div>
       ${skeletonGrid(16)}
     </div>`;
@@ -519,7 +585,7 @@
     const isSearch = path.includes('search');
     const sorts = SORTS.filter((s) => s.key !== 'ht' || !/[?&]c=/.test(path));
 
-    view.innerHTML = `<div class="view-inner">
+    subPane.innerHTML = `<div class="view-inner">
       <div class="page-head">
         <div>
           <h1 class="page-title">${esc(title)}</h1>
@@ -561,7 +627,7 @@
       stateEmpty('视频编号缺失');
       return;
     }
-    view.innerHTML = `<div class="view-inner">
+    subPane.innerHTML = `<div class="view-inner">
       <div class="video-layout">
         <div>
           <div class="player-wrap"><div class="center-load"><span class="spinner"></span> 正在解析视频地址…</div></div>
@@ -587,7 +653,7 @@
       .map((t) => `<button class="chip tag" data-cat="${esc(t.href)}" data-catname="${esc(t.name)}">${esc(t.name)}</button>`)
       .join('');
 
-    view.innerHTML = `<div class="view-inner">
+    subPane.innerHTML = `<div class="view-inner">
       <div class="video-layout">
         <div class="video-main">
           <div class="player-wrap" id="playerMount"></div>
@@ -679,7 +745,7 @@
       stateEmpty('还没有观看记录', '看过的视频会自动出现在这里，方便继续观看。');
       return;
     }
-    view.innerHTML = `<div class="view-inner">
+    subPane.innerHTML = `<div class="view-inner">
       <div class="page-head">
         <div><h1 class="page-title">观看历史</h1><div class="page-sub">最近 ${list.length} 条记录 · 仅保存在本机</div></div>
         <div class="head-actions">
@@ -696,7 +762,7 @@
     const settings = S.settings || { domain: 'https://cn.pornhub.com', proxy: { enabled: true, host: '127.0.0.1', port: 7897 } };
     const proxy = settings.proxy || {};
     const account = S.account;
-    view.innerHTML = `<div class="view-inner" style="max-width:860px">
+    subPane.innerHTML = `<div class="view-inner" style="max-width:860px">
       <div class="page-head">
         <div><h1 class="page-title">设置</h1><div class="page-sub">网络代理、账号与本地数据</div></div>
         <button class="btn small ghost" data-act="open-site">${icons('external')} 打开官网</button>
@@ -1440,6 +1506,7 @@
       });
 
       this.onKey = (e) => {
+        if ($('.modal-mask')) return;
         if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
         if (e.ctrlKey || e.altKey || e.metaKey) return;
         switch (e.key) {
@@ -1483,6 +1550,34 @@
       document.addEventListener('click', this.onDocClick);
     }
 
+    async autoRefreshStream() {
+      if (this.refreshing || this.destroyed || !this.vkey) return false;
+      this.refreshing = true;
+      this.flash('播放地址已失效，正在自动刷新…');
+      try {
+        const savedTime = this.video.currentTime || this.resumeAt || 0;
+        const data = await invoke('get_video', { vkey: this.vkey, force: true });
+        if (this.destroyed) return false;
+        const sources = (data && data.sources) || [];
+        const validSources = sources.filter((s) => s && s.url);
+        if (!validSources.length) throw new Error('未获取到有效播放地址');
+        this.sources = validSources;
+        this.resumeAt = savedTime;
+        this.restored = false;
+        const preferred =
+          validSources.find((s) => s.isDefault) ||
+          validSources.slice().sort((a, b) => (b.height || 0) - (a.height || 0))[0];
+        this.load(preferred);
+        this.flash('已自动恢复播放');
+        return true;
+      } catch (err) {
+        this.fail('视频流加载失败，请手动刷新播放地址。');
+        return false;
+      } finally {
+        this.refreshing = false;
+      }
+    }
+
     startSource() {
       const sources = this.sources.filter((s) => s && s.url);
       if (!sources.length) {
@@ -1522,14 +1617,20 @@
           this.play();
         });
         hls.on(window.Hls.Events.LEVEL_SWITCHED, () => this.updateQualityLabel());
-        hls.on(window.Hls.Events.ERROR, (_evt, data) => {
+        hls.on(window.Hls.Events.ERROR, async (_evt, data) => {
           if (!data || !data.fatal) return;
+          const status = data.response && data.response.code;
+          if (status === 403 || status === 410) {
+            await this.autoRefreshStream();
+            return;
+          }
           if (data.type === window.Hls.ErrorTypes.NETWORK_ERROR) {
             this.flash('网络错误，正在重试…');
             try {
               hls.startLoad();
             } catch {
-              this.fail('视频流加载失败，请刷新播放地址。');
+              const recovered = await this.autoRefreshStream();
+              if (!recovered) this.fail('视频流加载失败，请刷新播放地址。');
             }
           } else if (data.type === window.Hls.ErrorTypes.MEDIA_ERROR) {
             try {
@@ -1538,7 +1639,8 @@
               this.fail('视频解码失败，请刷新播放地址。');
             }
           } else {
-            this.fail('视频流加载失败，请刷新播放地址。');
+            const recovered = await this.autoRefreshStream();
+            if (!recovered) this.fail('视频流加载失败，请刷新播放地址。');
           }
         });
         hls.loadSource(url);
@@ -1875,7 +1977,14 @@
   $$('#sideNav .navitem').forEach((btn) => {
     btn.addEventListener('click', () => {
       const nav = btn.dataset.nav;
-      if (nav === 'home') go({ name: 'home' });
+      if (nav === 'home') {
+        if (S.route && S.route.name === 'home') {
+          restoreScroll(0);
+          S.homeScrollTop = 0;
+          return;
+        }
+        go({ name: 'home' });
+      }
       else if (nav === 'categories') go({ name: 'categories' });
       else if (nav === 'history') go({ name: 'history' });
       else if (nav === 'settings') go({ name: 'settings' });
@@ -1922,13 +2031,14 @@
   );
 
   async function boot() {
-    view.innerHTML = `<div class="view-inner"><div class="center-load"><span class="spinner"></span> 正在初始化…</div></div>`;
+    homePane.innerHTML = `<div class="view-inner"><div class="center-load"><span class="spinner"></span> 正在初始化…</div></div>`;
+    subPane.style.display = 'none';
     try {
       const info = await invoke('get_settings');
       S.settings = info.settings;
       S.mediaBase = info.mediaBase;
     } catch (err) {
-      view.innerHTML = `<div class="view-inner">${stateBox(
+      homePane.innerHTML = `<div class="view-inner">${stateBox(
         '应用初始化失败',
         String(err),
         `<button class="btn" data-act="retry">重试</button>`
