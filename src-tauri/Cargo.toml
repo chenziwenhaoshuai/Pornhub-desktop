@@ -1,6 +1,6 @@
 [package]
 name = "ph-desktop"
-version = "1.0.0"
+version = "1.0.1"
 description = "Native desktop client for cn.pornhub.com"
 authors = ["local"]
 edition = "2021"
