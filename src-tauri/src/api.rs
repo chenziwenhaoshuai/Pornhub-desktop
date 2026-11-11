@@ -266,9 +266,14 @@ pub async fn fetch_account(settings: &Settings, jar: &CookieJar) -> Account {
     }
 }
 
-pub async fn home(settings: &Settings, jar: &CookieJar) -> Result<Home, String> {
+pub async fn home(settings: &Settings, jar: &CookieJar, page: u32) -> Result<Home, String> {
     let domain = origin(settings);
-    let (_, html) = net::fetch_text(settings, jar, &format!("{domain}/")).await?;
+    let url = if page <= 1 {
+        format!("{domain}/")
+    } else {
+        format!("{domain}/?page={page}")
+    };
+    let (_, html) = net::fetch_text(settings, jar, &url).await?;
     Ok(parse::parse_home(&html, &domain))
 }
 

@@ -10,16 +10,34 @@ pub fn referer(settings: &Settings) -> String {
 }
 
 pub fn url_for(settings: &Settings, path: &str, page: u32) -> Result<String, String> {
+    let path = path.trim();
     let base = format!("{}/", settings.domain.trim_end_matches('/'));
-    if !path.starts_with('/') || path.starts_with("//") {
-        return Err("非法的页面路径".into());
-    }
-    let mut url = url::Url::parse(&base).map_err(|e| format!("站点地址无效：{e}"))?;
-    let joined = url.join(path).map_err(|e| format!("页面地址无效：{e}"))?;
-    if joined.host_str() != url.host_str() {
-        return Err("非法的页面地址".into());
-    }
-    url = joined;
+    let mut base_url = url::Url::parse(&base).map_err(|e| format!("站点地址无效：{e}"))?;
+
+    let mut url = if path.starts_with("http://") || path.starts_with("https://") {
+        let parsed = url::Url::parse(path).map_err(|e| format!("页面地址无效：{e}"))?;
+        let base_host = base_url.host_str().unwrap_or("").to_ascii_lowercase();
+        let target_host = parsed.host_str().unwrap_or("").to_ascii_lowercase();
+        if !target_host.ends_with("pornhub.com") && target_host != base_host {
+            return Err("非法的页面地址".into());
+        }
+        base_url.set_path(parsed.path());
+        base_url.set_query(parsed.query());
+        base_url
+    } else {
+        let clean_path = if path.starts_with('/') {
+            path
+        } else {
+            &format!("/{path}")
+        };
+        if clean_path.starts_with("//") {
+            return Err("非法的页面路径".into());
+        }
+        base_url
+            .join(clean_path)
+            .map_err(|e| format!("页面地址无效：{e}"))?
+    };
+
     if page > 1 {
         url.query_pairs_mut().append_pair("page", &page.to_string());
     }

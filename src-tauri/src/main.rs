@@ -92,11 +92,17 @@ async fn test_connection(state: State<'_, AppState>) -> Result<net::TestResult, 
 }
 
 #[tauri::command]
-async fn get_home(state: State<'_, AppState>, force: Option<bool>) -> Result<Value, String> {
+async fn get_home(
+    state: State<'_, AppState>,
+    page: Option<u32>,
+    force: Option<bool>,
+) -> Result<Value, String> {
+    let page = page.unwrap_or(1).max(1);
     let settings = state.settings().await;
     let jar = state.jar.clone();
-    cached_json(&state, "home".into(), force.unwrap_or(false), || async {
-        let home = api::home(&settings, &jar).await?;
+    let key = format!("home:{page}");
+    cached_json(&state, key, force.unwrap_or(false), || async {
+        let home = api::home(&settings, &jar, page).await?;
         to_value(home)
     })
     .await

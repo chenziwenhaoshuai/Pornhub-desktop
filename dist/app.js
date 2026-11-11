@@ -19,6 +19,10 @@
     seq: 0,
     homeRendered: false,
     homeScrollTop: 0,
+    homePage: 1,
+    homeLoading: false,
+    homeHasMore: true,
+    seenHomeVkeys: new Set(),
   };
 
   const HISTORY_KEY = 'ph.history.v1';
@@ -47,6 +51,20 @@
 
   const mediaUrl = (url) => (url ? `${S.mediaBase}/m?u=${b64url(url)}` : '');
   const imgUrl = (url) => (url ? `${S.mediaBase}/i?u=${b64url(url)}` : '');
+
+  function toRelativePath(raw) {
+    if (!raw) return '/video';
+    const text = String(raw).trim();
+    if (text.startsWith('http://') || text.startsWith('https://')) {
+      try {
+        const u = new URL(text);
+        return u.pathname + u.search;
+      } catch {
+        return text;
+      }
+    }
+    return text.startsWith('/') ? text : '/' + text;
+  }
 
   function fmtTime(seconds) {
     if (!isFinite(seconds) || seconds < 0) seconds = 0;
@@ -122,7 +140,8 @@
     const now = Date.now();
     if (!force) {
       const hit = memoryCache.get(key);
-      const ttl = key === 'home' ? Infinity : CACHE_TTL;
+      const isHomeKey = key === 'home' || String(key).startsWith('home:');
+      const ttl = isHomeKey ? Infinity : CACHE_TTL;
       if (hit && (ttl === Infinity || now - hit.at < ttl)) return hit.value;
     }
     const value = await invoke(command, args);
@@ -133,6 +152,9 @@
   function clearClientCache() {
     memoryCache.clear();
     S.homeRendered = false;
+    S.homePage = 1;
+    S.homeHasMore = true;
+    S.seenHomeVkeys = new Set();
   }
 
   /* ------------------------------- history ------------------------------- */
@@ -462,9 +484,14 @@
 
   async function renderHome(params, seq, force) {
     homePane.innerHTML = `<div class="view-inner">${skeletonGrid(14)}</div>`;
+    S.homePage = 1;
+    S.homeLoading = false;
+    S.homeHasMore = true;
+    S.seenHomeVkeys = new Set();
+
     let data;
     try {
-      data = await cached('get_home', { force: !!force }, 'home', force);
+      data = await cached('get_home', { page: 1, force: !!force }, 'home:1', force);
     } catch (err) {
       if (seq === S.seq) stateError(String(err));
       return;
@@ -480,6 +507,9 @@
     }
     const hero = items[0];
     const rest = items.slice(1);
+    if (hero && hero.vkey) S.seenHomeVkeys.add(hero.vkey);
+    rest.forEach((x) => x.vkey && S.seenHomeVkeys.add(x.vkey));
+
     const history = getHistory()
       .filter((x) => x.position > 10)
       .slice(0, 8);
@@ -512,8 +542,52 @@
       }
       </div>
       <div class="section-title">为你推荐<span class="rule"></span></div>
-      <div class="grid">${rest.map((item) => card(item)).join('')}</div>
+      <div class="grid" id="homeFeedGrid">${rest.map((item) => card(item)).join('')}</div>
+      <div id="homeLoadingMore" class="loading-more" style="display:none;"><span class="spinner"></span> 正在加载更多推荐…</div>
+      <div id="homeNoMore" class="loading-more" style="display:none; color:var(--muted); font-size:13px;">已加载全部推荐</div>
     </div>`;
+  }
+
+  async function loadMoreHome() {
+    if (S.homeLoading || !S.homeHasMore) return;
+    if (!S.route || S.route.name !== 'home') return;
+    const feedGrid = $('#homeFeedGrid', homePane);
+    if (!feedGrid) return;
+
+    S.homeLoading = true;
+    const loadingEl = $('#homeLoadingMore', homePane);
+    const noMoreEl = $('#homeNoMore', homePane);
+    if (loadingEl) loadingEl.style.display = 'flex';
+    if (noMoreEl) noMoreEl.style.display = 'none';
+
+    const nextPage = S.homePage + 1;
+    try {
+      const data = await cached('get_home', { page: nextPage }, `home:${nextPage}`, false);
+      const items = (data && data.items) || [];
+      if (!items.length) {
+        S.homeHasMore = false;
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (noMoreEl) noMoreEl.style.display = 'flex';
+        return;
+      }
+      const unique = items.filter((it) => it.vkey && !S.seenHomeVkeys.has(it.vkey));
+      unique.forEach((it) => S.seenHomeVkeys.add(it.vkey));
+
+      if (unique.length > 0) {
+        const cardsHtml = unique.map((it) => card(it)).join('');
+        feedGrid.insertAdjacentHTML('beforeend', cardsHtml);
+      }
+      S.homePage = nextPage;
+      if (items.length < 10) {
+        S.homeHasMore = false;
+        if (noMoreEl) noMoreEl.style.display = 'flex';
+      }
+    } catch (err) {
+      console.warn('加载更多推荐失败:', err);
+    } finally {
+      S.homeLoading = false;
+      if (loadingEl) loadingEl.style.display = 'none';
+    }
   }
 
   async function renderCategories(params, seq, force) {
@@ -560,7 +634,8 @@
   ];
 
   async function renderList(params, seq, force) {
-    const path = params.path || '/video';
+    const rawPath = params.path || '/video';
+    const path = toRelativePath(rawPath);
     const page = params.page || 1;
     const navKey = params.nav || '';
     const heading = params.title || '';
@@ -866,7 +941,8 @@
       return;
     }
     if (catEl) {
-      go({ name: 'list', params: { path: catEl.dataset.cat, title: catEl.dataset.catname } });
+      const path = toRelativePath(catEl.dataset.cat);
+      go({ name: 'list', params: { path, title: catEl.dataset.catname } });
       return;
     }
     if (pageEl) {
@@ -881,7 +957,8 @@
     if (sortEl) {
       const route = S.route;
       if (route && route.name === 'list') {
-        const path = withParam(route.params.path, 'o', sortEl.dataset.sort);
+        const cleanP = toRelativePath(route.params.path);
+        const path = withParam(cleanP, 'o', sortEl.dataset.sort);
         go({ name: 'list', params: { ...route.params, path, page: 1 } });
       }
       return;
@@ -915,7 +992,10 @@
         await doLogout();
         break;
       case 'refresh-home':
-        memoryCache.delete('home');
+        for (const k of Array.from(memoryCache.keys())) {
+          if (k === 'home' || k.startsWith('home:')) memoryCache.delete(k);
+        }
+        S.homeRendered = false;
         refresh();
         break;
       case 'refresh-cats':
@@ -2029,6 +2109,15 @@
     },
     true
   );
+
+  view.addEventListener('scroll', () => {
+    if (!S.route || S.route.name !== 'home') return;
+    if (S.homeLoading || !S.homeHasMore) return;
+    const threshold = 500;
+    if (view.scrollTop + view.clientHeight >= view.scrollHeight - threshold) {
+      loadMoreHome();
+    }
+  });
 
   async function boot() {
     homePane.innerHTML = `<div class="view-inner"><div class="center-load"><span class="spinner"></span> 正在初始化…</div></div>`;

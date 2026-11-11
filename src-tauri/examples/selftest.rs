@@ -17,7 +17,7 @@ async fn main() {
     let test = net::test(&settings, &jar).await;
     println!("net.test ok={} ms={} msg={}", test.ok, test.ms, test.message);
 
-    let home = api::home(&settings, &jar).await;
+    let home = api::home(&settings, &jar, 1).await;
     match &home {
         Ok(h) => {
             println!("home items={}", h.items.len());

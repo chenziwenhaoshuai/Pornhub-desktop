@@ -169,6 +169,15 @@ a { color: inherit; text-decoration: none; }
   scroll-behavior: smooth;
 }
 .view-pane { width: 100%; }
+.loading-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px 0 16px;
+  color: var(--muted);
+  font-size: 13.5px;
+}
 .view-inner { max-width: 1560px; margin: 0 auto; }
 
 .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
